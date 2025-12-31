@@ -284,6 +284,10 @@ void setTime(char key, bool forAlarm) {
     digits[digitIndex++] = key;
   }
 
+  if (key == 'C' && digitIndex > 0) {
+    digitIndex--;
+    digits[digitIndex] = 0;   // czyścimy cofniętą cyfrę
+  }
 //Zatwierdzanie
   if(key == '#' && digitIndex == 2) {
     int value = (digits[0] - '0') * 10 + (digits[1] - '0');
