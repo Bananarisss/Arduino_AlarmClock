@@ -413,7 +413,7 @@ void setDate(char key) {
     int value = (digits[0] - '0') * 10 + (digits[1] - '0');
 
     //Sprawdzanie poprawnych wartosci
-    if ((dateChangeStep == 1 && value > 12) || 
+    if ((dateChangeStep == 1 && (value > 12 || value < 1)) || (dateChangeStep==2 && value==0) ||
     (dateChangeStep == 2 && newMonth == 2 && value > 28) ||
     (dateChangeStep == 2 && (newMonth == 1 || newMonth == 3 || newMonth == 5 || newMonth == 7 || newMonth == 8 || newMonth == 10 || newMonth == 12) && value > 31) ||
     (dateChangeStep == 2 && (newMonth == 4 || newMonth == 6 || newMonth == 9 || newMonth == 11) && value > 30))
