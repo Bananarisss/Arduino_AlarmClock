@@ -531,6 +531,7 @@ void setVolume(char key)
 {
   lcd.setCursor(0,0);
   lcd.print("Glosnosc:");
+  if(tempVol<10) lcd.print("0");
   lcd.print(String(tempVol));
 
   lcd.setCursor(0,1);
