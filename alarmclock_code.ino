@@ -95,7 +95,6 @@ void setup() {
   Serial.begin(9600);
 
   rtc.begin();
-  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
   pinMode(CLOCK_INTERRUPT_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(CLOCK_INTERRUPT_PIN), alarmINT, FALLING);
@@ -115,6 +114,7 @@ void setup() {
   }
 
   lcd.clear();
+  randomSeed(rtc.now().unixtime());
 }
 
 /* ================== LOOP ================== */
@@ -134,7 +134,6 @@ void loop() {
         menuIndex = 0;
         lcd.clear();
       }
-      //checkAlarm();
       break;
 
     case MENU:
@@ -286,14 +285,14 @@ void setTime(char key, bool forAlarm) {
 
   if (key == 'C' && digitIndex > 0) {
     digitIndex--;
-    digits[digitIndex] = 0;   // czyścimy cofniętą cyfrę
+    digits[digitIndex] = 0;
   }
 //Zatwierdzanie
   if(key == '#' && digitIndex == 2) {
     int value = (digits[0] - '0') * 10 + (digits[1] - '0');
 
     //Sprawdzanie poprawnych wartosci
-    if ((timeChangeStep == 0 && value > 23) || (timeChangeStep == 1 && value > 59))
+    if ((timeChangeStep == 0 && (value > 23 || value == 0)) || (timeChangeStep == 1 && (value > 59 || value == 0)))
     {
       lcd.clear();
       lcd.setCursor(0,1);
@@ -405,7 +404,7 @@ void setDate(char key) {
 
   if (key == 'C' && digitIndex > 0) {
     digitIndex--;
-    digits[digitIndex] = 0;   // czyścimy cofniętą cyfrę
+    digits[digitIndex] = 0;
   }
 
 //Zatwierdzanie
@@ -414,7 +413,8 @@ void setDate(char key) {
 
     //Sprawdzanie poprawnych wartosci
     if ((dateChangeStep == 1 && (value > 12 || value < 1)) || (dateChangeStep==2 && value==0) ||
-    (dateChangeStep == 2 && newMonth == 2 && value > 28) ||
+    (dateChangeStep == 2 && (newYear %4 !=0) && newMonth == 2 && value > 28) ||
+    (dateChangeStep == 2 && (newYear %4 ==0) && newMonth == 2 && value > 29) ||
     (dateChangeStep == 2 && (newMonth == 1 || newMonth == 3 || newMonth == 5 || newMonth == 7 || newMonth == 8 || newMonth == 10 || newMonth == 12) && value > 31) ||
     (dateChangeStep == 2 && (newMonth == 4 || newMonth == 6 || newMonth == 9 || newMonth == 11) && value > 30))
     {
@@ -527,6 +527,7 @@ void setSound(char key) {
   }
 }
 
+/* ====== USTAWIANIE GLOSNOSCI ====== */
 void setVolume(char key)
 {
   lcd.setCursor(0,0);
@@ -627,28 +628,28 @@ void startAlarm() {
   int opType = random(0, 4);
 
   switch (opType) {
-    case 0: // DODAWANIE
+    case 0: // Dodawanie
       mathA = random(10, 50);
       mathB = random(1, 20);
       correctAnswer = mathA + mathB;
       mathOp = '+';
       break;
 
-    case 1: // ODEJMOWANIE
+    case 1: // Odejmowanie
       mathA = random(20, 60);
-      mathB = random(1, mathA); // żeby nie było ujemnych
+      mathB = random(1, mathA);
       correctAnswer = mathA - mathB;
       mathOp = '-';
       break;
 
-    case 2: // MNOŻENIE
+    case 2: // Mnożenie
       mathA = random(2, 10);
       mathB = random(2, 10);
       correctAnswer = mathA * mathB;
       mathOp = '*';
       break;
 
-    case 3: // DZIELENIE (CAŁKOWITE)
+    case 3: // dzielenie
       mathB = random(2, 10);
       correctAnswer = random(2, 10);
       mathA = mathB * correctAnswer;
@@ -671,7 +672,7 @@ void handleMathTask(char key) {
   if (mp3.available()) {
       uint8_t type = mp3.readType();
       if (type == DFPlayerPlayFinished) {
-        mp3.play(alarmSound);  // gra od nowa
+        mp3.play(alarmSound);
       }
   }
 
