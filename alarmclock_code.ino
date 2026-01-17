@@ -46,11 +46,9 @@ int alarmMinute = 0;
 int alarmSound = 1;
 int tempAlarmSound = 1;
 byte soundChangeStep = 0;
-byte alarmChangeStep = 0;
 
 bool alarmActive = false;
 bool alarmEnabled = false;
-int dayIndex = 0;
 
 /* ============== CLOCK =======================*/
 char daysOfTheWeek[7][12] = {"Niedz", "Pon", "Wt", "Sr", "Czw", "Pt", "Sob"};
@@ -571,8 +569,6 @@ void setVolume(char key)
   }
 }
 
-int alarmSelect = 0;
-
 /* ======= USUN ALARM =========*/
 void alarmOff(char key) {
 
@@ -604,7 +600,6 @@ void alarmOff(char key) {
   }
 
   if (key == '*') {
-    alarmSelect = 0;
     currentState = MENU;
     lcd.clear();
   }
